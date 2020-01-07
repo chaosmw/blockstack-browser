@@ -14,7 +14,8 @@ export {
   decryptBitcoinPrivateKey,
   calculateTrustLevel,
   calculateProfileCompleteness,
-  getBlockchainIdentities
+  getBlockchainIdentities,
+  getSubstrateKeyring
 } from './account-utils'
 
 export { authorizationHeaderValue } from './api-utils'

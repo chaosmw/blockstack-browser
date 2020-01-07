@@ -51,6 +51,7 @@ function mapStateToProps(state) {
     createProfileError: state.profiles.identity.createProfileError,
     identityKeypairs: state.account.identityAccount.keypairs,
     identityAddresses: state.account.identityAccount.addresses,
+    substrateAddresses: state.account.substrateAccount.addresses,
     storageConnected: state.settings.api.storageConnected,
     nextUnusedAddressIndex: state.account.identityAccount.addressIndex,
     api: state.settings.api,
@@ -76,6 +77,7 @@ export class DefaultProfilePage extends Component {
     refreshSocialProofVerifications: PropTypes.func.isRequired,
     api: PropTypes.object.isRequired,
     identityAddresses: PropTypes.array.isRequired,
+    substrateAddresses: PropTypes.array.isRequired,
     nextUnusedAddressIndex: PropTypes.number.isRequired,
     encryptedBackupPhrase: PropTypes.string.isRequired,
     setDefaultIdentity: PropTypes.func.isRequired,
@@ -504,6 +506,7 @@ export class DefaultProfilePage extends Component {
   render() {
     const identityIndex = this.props.defaultIdentity
     const identity = this.state.localIdentities[identityIndex]
+    const substrateAddress = this.props.substrateAddresses[identityIndex]
     const profile = this.state.profile
     const person = new Person(profile)
 
@@ -821,6 +824,12 @@ export class DefaultProfilePage extends Component {
                           <small>
                             <span data-tip data-for="ownerAddress">
                               {`ID-${identity.ownerAddress}`}
+                            </span>
+                          </small>
+                          <br/>
+                          <small>
+                            <span data-tip data-for="ownerAddress">
+                              {`PISTIS-${substrateAddress}`}
                             </span>
                           </small>
                         </div>

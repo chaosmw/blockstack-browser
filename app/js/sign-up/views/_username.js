@@ -26,6 +26,7 @@ const getUsernameStatus = async (
     return null
   }
   const url = `${apiUrl}/${username.toLowerCase()}${sponsoredName}`
+  logger.debug(`[hsiung] ${url} with ${sponsoredName} `)
   try {
     const res = await fetch(url)
     const user = await res.json()

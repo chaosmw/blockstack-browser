@@ -40,6 +40,7 @@ describe('AccountActions', () => {
       identityAddresses: 'fakeIdentityAddresses',
       identityKeypairs: 'fakeIdentityAddresses'
     }
+    const backupPhrase = 'fakeBackupPhrase'
     const encryptedBackupPhrase = 'fakeEncryptedBackupPhrase'
     const masterKeychain = 'fakeMasterKeychain'
     const identitiesToGenerate = 'fakeIdentitiesToGenerate'
@@ -50,6 +51,7 @@ describe('AccountActions', () => {
       getBlockchainIdentitiesStub = sinon.stub().returns(getBlockchainIdentitiesResult)
       AccountActions.__Rewire__('getBlockchainIdentities', getBlockchainIdentitiesStub)
       action = AccountActions.createAccount(
+        backupPhrase,
         encryptedBackupPhrase,
         masterKeychain,
         identitiesToGenerate

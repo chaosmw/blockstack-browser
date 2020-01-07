@@ -3,6 +3,13 @@ import { HDNode } from 'bitcoinjs-lib'
 import crypto from 'crypto'
 import log4js from 'log4js'
 
+import { isHex, u8aToHex } from '@polkadot/util'
+import Keyring from '@polkadot/keyring'
+import { DEV_PHRASE } from '@polkadot/keyring/defaults';
+import { keyExtractSuri, mnemonicGenerate, mnemonicValidate, randomAsU8a } from '@polkadot/util-crypto';
+
+const DEFAULT_PAIR_TYPE = 'sr25519'
+
 const logger = log4js.getLogger(__filename)
 
 function hashCode(string) {
@@ -464,5 +471,75 @@ export function getBlockchainIdentities(masterKeychain, identitiesToGenerate) {
     firstBitcoinAddress,
     identityAddresses,
     identityKeypairs
+  }
+}
+
+/// The following routines are for substrate
+function isHexSeed (seed) {
+  return isHex(seed) && seed.length === 66;
+}
+
+function rawValidate (seed) {
+  return ((seed.length > 0) && (seed.length <= 32)) || isHexSeed(seed);
+}
+
+function addressFromSeed (phrase, derivePath, pairType) {
+  let keyring = new Keyring();
+  return keyring
+    .createFromUri(`${phrase.trim()}${derivePath}`, {}, pairType)
+    .address;
+}
+
+function newSeed (seed, seedType) {
+  switch (seedType) {
+    case 'bip':
+      return mnemonicGenerate();
+    case 'dev':
+      return DEV_PHRASE;
+    default:
+      return seed || u8aToHex(randomAsU8a());
+  }
+}
+
+function generateSeed (_seed, derivePath, seedType, pairType = DEFAULT_PAIR_TYPE) {
+  const seed = newSeed(_seed, seedType);
+  const address = addressFromSeed(seed, derivePath, pairType);
+
+  return {
+    address,
+    deriveError: null,
+    derivePath,
+    isSeedValid: true,
+    pairType,
+    seedType,
+    seed
+  };
+}
+
+export function getSubstrateKeyring(backupPhrase, identitiesToGenerate) {
+
+  let substrateKeyring = new Keyring({
+    'type': 'ed25519'
+  });
+
+  // We pre-generate a number of identity addresses so that we
+  // don't have to prompt the user for the password on each new profile
+  const substrateAddresses = []
+  for (
+    let addressIndex = 0;
+    addressIndex < identitiesToGenerate;
+    addressIndex++
+  ) {
+    let derivePath = `//pistis-did-${addressIndex}`
+    let suri = `${backupPhrase.trim()}${derivePath}`
+    let pair = substrateKeyring.createFromUri(suri, {})
+    substrateKeyring.addPair(pair) 
+    substrateAddresses.push(pair.address)
+    logger.debug(`getSubstrateKeyring: identity index: ${addressIndex} address: ${pair.address}`)
+  } 
+
+  return {
+    substrateKeyring,
+    substrateAddresses
   }
 }

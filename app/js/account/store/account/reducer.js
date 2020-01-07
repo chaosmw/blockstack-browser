@@ -15,6 +15,10 @@ const initialState = {
     addresses: [],
     balances: { total: 0.0 }
   },
+  substrateAccount: {
+    keyring: null,
+    addresses: []
+  },
   coreWallet: {
     address: null,
     balance: 0.0,
@@ -50,6 +54,10 @@ function AccountReducer(state = initialState, action) {
           addresses: [action.firstBitcoinAddress],
           addressIndex: 0,
           balances: state.bitcoinAccount.balances
+        },
+        substrateAccount: {
+          keyring: action.substrateKeyring,
+          addresses: action.substrateAddresses
         }
       })
     case types.UPDATE_EMAIL_ADDRESS:

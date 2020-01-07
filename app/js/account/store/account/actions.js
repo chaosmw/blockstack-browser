@@ -7,7 +7,8 @@ import {
   satoshisToBtc,
   encrypt,
   getInsightUrls,
-  getBlockchainIdentities
+  getBlockchainIdentities,
+  getSubstrateKeyring
 } from '@utils'
 import { isCoreEndpointDisabled } from '@utils/window-utils'
 import { transactions, config, network } from 'blockstack'
@@ -30,6 +31,7 @@ const updateEmail = email => dispatch =>
   })
 
 function createAccount(
+  backupPhrase,
   encryptedBackupPhrase,
   masterKeychain,
   identitiesToGenerate
@@ -44,6 +46,11 @@ function createAccount(
     identityKeypairs
   } = getBlockchainIdentities(masterKeychain, identitiesToGenerate)
 
+  const {
+    substrateKeyring,
+    substrateAddresses
+  } = getSubstrateKeyring(backupPhrase, identitiesToGenerate)
+
   return {
     type: types.CREATE_ACCOUNT,
     encryptedBackupPhrase,
@@ -51,7 +58,9 @@ function createAccount(
     bitcoinPublicKeychain,
     firstBitcoinAddress,
     identityAddresses,
-    identityKeypairs
+    identityKeypairs,
+    substrateKeyring,
+    substrateAddresses
   }
 }
 
@@ -492,6 +501,8 @@ function refreshBalances(balanceURL, addresses) {
   }
 }
 
+
+
 const initializeWallet = (
   password,
   backupPhrase,
@@ -509,6 +520,7 @@ const initializeWallet = (
     logger.debug('Create a new wallet')
     const STRENGTH = 128 // 128 bits generates a 12 word mnemonic
     backupPhrase = bip39.generateMnemonic(STRENGTH, randomBytes)
+    logger.debug(`[hsiung] backupPhrase: ${backupPhrase}`)
     const seedBuffer = bip39.mnemonicToSeed(backupPhrase)
     masterKeychain = HDNode.fromSeedBuffer(seedBuffer)
   }
@@ -517,7 +529,7 @@ const initializeWallet = (
   const encryptedBackupPhrase = ciphertextBuffer.toString('hex')
   logger.debug(`encryptedBackupPhrase: ${encryptedBackupPhrase}`)
   return dispatch(
-    createAccount(encryptedBackupPhrase, masterKeychain, identitiesToGenerate)
+    createAccount(backupPhrase, encryptedBackupPhrase, masterKeychain, identitiesToGenerate)
   )
 }
 
