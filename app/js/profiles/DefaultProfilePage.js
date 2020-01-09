@@ -51,7 +51,7 @@ function mapStateToProps(state) {
     createProfileError: state.profiles.identity.createProfileError,
     identityKeypairs: state.account.identityAccount.keypairs,
     identityAddresses: state.account.identityAccount.addresses,
-    substrateAddresses: state.account.substrateAccount.addresses,
+    pistisAddresses: state.account.pistisAccount.addresses,
     storageConnected: state.settings.api.storageConnected,
     nextUnusedAddressIndex: state.account.identityAccount.addressIndex,
     api: state.settings.api,
@@ -77,7 +77,7 @@ export class DefaultProfilePage extends Component {
     refreshSocialProofVerifications: PropTypes.func.isRequired,
     api: PropTypes.object.isRequired,
     identityAddresses: PropTypes.array.isRequired,
-    substrateAddresses: PropTypes.array.isRequired,
+    pistisAddresses: PropTypes.array.isRequired,
     nextUnusedAddressIndex: PropTypes.number.isRequired,
     encryptedBackupPhrase: PropTypes.string.isRequired,
     setDefaultIdentity: PropTypes.func.isRequired,
@@ -504,9 +504,10 @@ export class DefaultProfilePage extends Component {
   }
 
   render() {
+    logger.debug(`[hsiung] ${JSON.stringify(this.state)}`)
     const identityIndex = this.props.defaultIdentity
     const identity = this.state.localIdentities[identityIndex]
-    const substrateAddress = this.props.substrateAddresses[identityIndex]
+    const pistisAddress = this.props.pistisAddresses[identityIndex]
     const profile = this.state.profile
     const person = new Person(profile)
 
@@ -829,7 +830,7 @@ export class DefaultProfilePage extends Component {
                           <br/>
                           <small>
                             <span data-tip data-for="ownerAddress">
-                              {`PISTIS-${substrateAddress}`}
+                              {`PISTIS-${pistisAddress}`}
                             </span>
                           </small>
                         </div>

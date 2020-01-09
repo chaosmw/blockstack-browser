@@ -15,9 +15,10 @@ const initialState = {
     addresses: [],
     balances: { total: 0.0 }
   },
-  substrateAccount: {
+  pistisAccount: {
     keyring: null,
-    addresses: []
+    addresses: [],
+    balances: { total: 0.0 }
   },
   coreWallet: {
     address: null,
@@ -55,9 +56,11 @@ function AccountReducer(state = initialState, action) {
           addressIndex: 0,
           balances: state.bitcoinAccount.balances
         },
-        substrateAccount: {
+        pistisAccount: {
           keyring: action.substrateKeyring,
-          addresses: action.substrateAddresses
+          addresses: action.substrateAddresses,
+          addressIndex: 0,
+          balances: state.pistisAccount.balances 
         }
       })
     case types.UPDATE_EMAIL_ADDRESS:
@@ -112,6 +115,14 @@ function AccountReducer(state = initialState, action) {
           publicKeychain: state.bitcoinAccount.publicKeychain,
           addresses: state.bitcoinAccount.addresses,
           balances: action.balances
+        }
+      })
+    case types.UPDATE_PTS_BALANCES:
+      return Object.assign({}, state, {
+        pistisAccount: {
+          keyring: state.pistisAccount.keyring,
+          addresses: state.pistisAccount.addresses,
+          balances: action.balances 
         }
       })
     case types.BUILD_TRANSACTION:

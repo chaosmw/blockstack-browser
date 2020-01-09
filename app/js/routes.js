@@ -199,6 +199,30 @@ const SendCorePage = Loadable({
   delay: LOADABLE_DELAY
 })
 
+const PistisApp = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "PistisApp" */ './pistis/WalletApp'),
+  loading: Loading,
+  delay: LOADABLE_DELAY
+})
+const PistisReceivePage = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "PistisReceivePage" */ './pistis/ReceivePage'),
+  loading: Loading,
+  delay: LOADABLE_DELAY
+})
+const PistisSendPage = Loadable({
+  loader: () => import(/* webpackChunkName: "PistisSendPage" */ './pistis/SendPage'),
+  loading: Loading,
+  delay: LOADABLE_DELAY
+})
+const PistisSendCorePage = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "PistisSendCorePage" */ './pistis/SendCorePage'),
+  loading: Loading,
+  delay: LOADABLE_DELAY
+})
+
 const NewAuthPage = Loadable({
   loader: () => import(/* webpackChunkName: "NewAuthPage" */ './auth/index'),
   loading: Loading,
@@ -291,6 +315,12 @@ export default (
         <Route path="receive" component={ReceivePage} />
         <Route path="send" component={SendPage} />
         <Route path="send-core" component={SendCorePage} />
+      </Route>
+
+      <Route path="pistis" component={PistisApp}>
+        <Route path="receive" component={PistisReceivePage} />
+        <Route path="send" component={PistisSendPage} />
+        <Route path="send-core" component={PistisSendCorePage} />
       </Route>
 
       <Route path="/auth" component={NewAuthPage} />

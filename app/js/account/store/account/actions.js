@@ -12,6 +12,7 @@ import {
 } from '@utils'
 import { isCoreEndpointDisabled } from '@utils/window-utils'
 import { transactions, config, network } from 'blockstack'
+import { Rpc, ptsToDev } from '../../../chain'
 
 import roundTo from 'round-to'
 import * as types from './types'
@@ -96,6 +97,13 @@ function updateBackupPhrase(encryptedBackupPhrase) {
 function updateBalances(balances) {
   return {
     type: types.UPDATE_BALANCES,
+    balances
+  }
+}
+
+function updatePtsBalances(balances) {
+  return {
+    type: types.UPDATE_PTS_BALANCES,
     balances
   }
 }
@@ -501,7 +509,70 @@ function refreshBalances(balanceURL, addresses) {
   }
 }
 
+function refreshPtsBalances(balanceURL, addresses) {
+  return dispatch => {
+    const results = []
+    return Promise.all(
+      addresses.map(address => {
+        logger.debug( 
+          `refreshPtsBalances: refreshing pts balances for address ${address}`
+        )
+        
+        // TODO: 
+        // return Promise.resolve({
+        //     total: 888
+        // }).then(balances => {
+        //   dispatch(updatePtsBalances(balances))
+        // })
 
+        return Rpc.queryBalance(address, balanceURL)
+          .then(response => {
+            results.push({
+              address,
+              balance: ptsToDev(parseInt(response)) // TODO: 
+            })
+
+            if (results.length >= addresses.length) {
+              let balances = {}
+              let total = 0.0
+
+              for (let i = 0; i < results.length; i++) {
+                const thisAddress = results[i].address
+                if (!balances.hasOwnProperty(thisAddress)) {
+                  const balance = results[i].balance
+                  total = total + balance
+                  balances[thisAddress] = balance
+                } else {
+                  logger.error(
+                    `refreshPtsBalances: Duplicate address ${thisAddress} in addresses array`
+                  )
+                }
+              }
+              balances.total = total
+              dispatch(updatePtsBalances(balances))
+            }
+          })
+          .catch(error => {
+            logger.error(
+              `refreshPtsBalances: error fetching ${address} balance`,
+              error
+            )
+          })
+      })
+    )
+      .then(() => {
+        logger.debug(
+          'refreshPtsBalances: done refreshing balances for all addresses'
+        )
+      })
+      .catch(error => {
+        logger.error(
+          'refreshPtsBalances: error refreshing balances for addresses',
+          error
+        )
+      })
+  }
+}
 
 const initializeWallet = (
   password,
@@ -566,6 +637,7 @@ const AccountActions = {
   newBitcoinAddress,
   deleteAccount,
   refreshBalances,
+  refreshPtsBalances,
   getCoreWalletAddress,
   refreshCoreWalletBalance,
   resetCoreWithdrawal,

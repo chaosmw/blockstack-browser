@@ -25,6 +25,13 @@ function updateBtcPrice(price) {
   }
 }
 
+function updatePtsPrice(price) {
+  return {
+    type: types.UPDATE_PTS_PRICE,
+    price
+  }
+}
+
 function refreshBtcPrice(btcPriceUrl) {
   return dispatch => (
     fetch(btcPriceUrl)
@@ -35,6 +42,20 @@ function refreshBtcPrice(btcPriceUrl) {
       })
       .catch(error => {
         logger.error('refreshBtcPrice:', error)
+      })
+  )
+}
+
+function refreshPtsPrice(ptsPriceUrl) {
+  return dispatch => (
+    fetch(ptsPriceUrl)
+      .then(response => response.text())
+      .then(responseText => JSON.parse(responseText))
+      .then(responseJson => {
+        dispatch(updatePtsPrice(responseJson.last))
+      })
+      .catch(error => {
+        logger.error('refreshPtsPrice:', error)
       })
   )
 }
@@ -113,9 +134,11 @@ function connectStorage(customGaiaUrl) {
 
 const SettingsActions = {
   refreshBtcPrice,
+  refreshPtsPrice,
   resetApi,
   updateApi,
   updateBtcPrice,
+  updatePtsPrice,
   connectStorage
 }
 

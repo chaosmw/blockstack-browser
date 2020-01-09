@@ -31,6 +31,12 @@ const navBarData = [
       active: 'wallet'
     },
     {
+      label: 'Pistis',
+      icon: WalletIcon,
+      path: '/pistis/receive',
+      active: 'pistis'
+    },
+    {
       label: 'Settings',
       icon: SettingsIcon,
       path: '/account',

@@ -26,6 +26,12 @@ function SettingsReducer(state = initialState, action) {
           btcPrice: action.price
         })
       })
+    case types.UPDATE_PTS_PRICE:
+      return Object.assign({}, state, {
+        api: Object.assign({}, state.api, {
+          ptsPrice: action.price
+        })
+      })
     case '@@INIT': {
       // Update with new keys on initial action
       return addMissingApiKeys({

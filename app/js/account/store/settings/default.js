@@ -22,6 +22,7 @@ const DEFAULT_API = {
   zeroConfBalanceUrl: `${DEFAULT_CORE_API_ENDPOINT}/v1/wallet/balance/0`,
   insightUrl: 'https://utxo.blockstack.org/insight-api/addr/{address}',
   btcBalanceUrl: 'https://blockchain.info/q/addressbalance/',
+  ptsBalanceUrl: 'ws://127.0.0.1:9944',
   broadcastUrl: 'https://utxo.blockstack.org/insight-api/tx/send',
   priceUrl: `${DEFAULT_CORE_API_ENDPOINT}/v2/prices/names/{name}`,
   networkFeeUrl: 'https://bitcoinfees.21.co/api/v1/fees/recommended',
@@ -32,6 +33,7 @@ const DEFAULT_API = {
   ethereumAddressUrl: 'https://tradeblock.com/ethereum/account/{identifier}',
   pgpKeyUrl: 'https://pgp.mit.edu/pks/lookup?search={identifier}&op=vindex&fingerprint=on',
   btcPriceUrl: 'https://www.bitstamp.net/api/v2/ticker/btcusd/?cors=1',
+  ptsPriceUrl: 'https://www.bitstamp.net/api/v2/ticker/btcusd/?cors=1',
   corePingUrl: `${DEFAULT_CORE_API_ENDPOINT}/v1/node/ping`,
   zoneFileUrl: `${DEFAULT_CORE_API_ENDPOINT}/v1/names/{name}/zonefile`,
   nameTransferUrl: `${DEFAULT_CORE_API_ENDPOINT}/v1/names/{name}/owner`,
@@ -60,6 +62,7 @@ const DEFAULT_API = {
   gaiaHubConfig: null,
   gaiaHubUrl: 'https://hub.blockstack.org',
   btcPrice: '1000.00',
+  ptsPrice: '1000.00',
   distinctEventId: crypto.randomBytes(16).toString('hex'),
   hasDisabledEventTracking: false
 }

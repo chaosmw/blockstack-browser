@@ -4,6 +4,7 @@
   "version": "0.36.5",
   "author": "Blockstack PBC <admin@blockstack.com>",
   "dependencies": {
+    "@polkadot/api": "^0.99.1",
     "@polkadot/keyring": "^1.7.1",
     "@polkadot/util": "^1.7.1",
     "@polkadot/util-crypto": "^1.7.1",
