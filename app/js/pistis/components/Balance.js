@@ -18,7 +18,7 @@ function mapStateToProps(state) {
   return {
     addresses: state.account.pistisAccount.addresses,
     balances: state.account.pistisAccount.balances,
-    ptsBalanceUrl: state.settings.api.ptsBalanceUrl,
+    ptsNodeUrl: state.settings.api.ptsNodeUrl,
     ptsPriceUrl: state.settings.api.ptsPriceUrl,
     ptsPrice: state.settings.api.ptsPrice,
     coreAPIPassword: state.settings.api.coreAPIPassword
@@ -34,7 +34,7 @@ class Balance extends Component {
     addresses: PropTypes.array.isRequired,
     balances: PropTypes.object.isRequired,
     refreshPtsBalances: PropTypes.func.isRequired,
-    ptsBalanceUrl: PropTypes.string.isRequired,
+    ptsNodeUrl: PropTypes.string.isRequired,
     ptsPriceUrl: PropTypes.string.isRequired,
     ptsPrice: PropTypes.string.isRequired,
     refreshPtsPrice: PropTypes.func.isRequired,
@@ -49,12 +49,12 @@ class Balance extends Component {
   }
 
   componentDidMount() {
-    logger.debug(`[hsiung] ${this.props.ptsBalanceUrl}, ${this.props.addresses}`)
-    this.props.refreshPtsBalances(this.props.ptsBalanceUrl, this.props.addresses)
+    logger.debug(`[hsiung] ${this.props.ptsNodeUrl}, ${this.props.addresses}`)
+    this.props.refreshPtsBalances(this.props.ptsNodeUrl, this.props.addresses)
     this.props.refreshPtsPrice(this.props.ptsPriceUrl)
     this.balanceTimer = setInterval(() => {
       logger.debug('balanceTimer: calling refreshPtsBalances...')
-      this.props.refreshPtsBalances(this.props.ptsBalanceUrl, this.props.addresses)
+      this.props.refreshPtsBalances(this.props.ptsNodeUrl, this.props.addresses)
       this.props.refreshPtsPrice(this.props.ptsPriceUrl)
     }, UPDATE_BALANCE_INTERVAL)
   }

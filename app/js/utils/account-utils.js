@@ -136,6 +136,23 @@ export function isBackupPhraseValid(backupPhrase) {
   })
 }
 
+export function decryptMnemonic(password, encryptedBackupPhrase) {
+  return new Promise((resolve, reject) => {
+    const dataBuffer = new Buffer(encryptedBackupPhrase, 'hex')
+    decrypt(dataBuffer, password).then(
+      plaintextBuffer => {
+        logger.info('decryptMnemonic: decrypted!')
+        const backupPhrase = plaintextBuffer.toString()
+        resolve(backupPhrase)
+      },
+      error => {
+        logger.error('decryptMnemonic: error', error)
+        reject(new Error('Incorrect password'))
+      }
+    )
+  })
+}
+
 export function decryptMasterKeychain(password, encryptedBackupPhrase) {
   return new Promise((resolve, reject) => {
     const dataBuffer = new Buffer(encryptedBackupPhrase, 'hex')

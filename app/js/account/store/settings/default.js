@@ -22,7 +22,7 @@ const DEFAULT_API = {
   zeroConfBalanceUrl: `${DEFAULT_CORE_API_ENDPOINT}/v1/wallet/balance/0`,
   insightUrl: 'https://utxo.blockstack.org/insight-api/addr/{address}',
   btcBalanceUrl: 'https://blockchain.info/q/addressbalance/',
-  ptsBalanceUrl: 'ws://127.0.0.1:9944',
+  ptsNodeUrl: 'ws://127.0.0.1:9944',
   broadcastUrl: 'https://utxo.blockstack.org/insight-api/tx/send',
   priceUrl: `${DEFAULT_CORE_API_ENDPOINT}/v2/prices/names/{name}`,
   networkFeeUrl: 'https://bitcoinfees.21.co/api/v1/fees/recommended',

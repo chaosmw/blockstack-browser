@@ -10,9 +10,6 @@ import Balance            from './components/Balance'
 function mapStateToProps(state) {
   return {
     addresses: state.account.pistisAccount.addresses,
-    // coreWalletAddress: state.account.coreWallet.address,
-    // walletPaymentAddressUrl: state.settings.api.walletPaymentAddressUrl,
-    // coreAPIPassword: state.settings.api.coreAPIPassword
   }
 }
 
@@ -23,14 +20,9 @@ function mapDispatchToProps(dispatch) {
 class ReceivePage extends Component {
   static propTypes = {
     addresses: PropTypes.array.isRequired,
-    // coreWalletAddress: PropTypes.string,
-    // getCoreWalletAddress: PropTypes.func.isRequired,
-    // walletPaymentAddressUrl: PropTypes.string.isRequired,
-    // coreAPIPassword: PropTypes.string.isRequired
   }
 
   componentWillMount() {
-    // this.props.getCoreWalletAddress(this.props.walletPaymentAddressUrl, this.props.coreAPIPassword)
   }
 
   render() {

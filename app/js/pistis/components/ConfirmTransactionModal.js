@@ -4,18 +4,19 @@ import Modal from 'react-modal'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { AccountActions } from '../../account/store/account'
-import { summarizeTransactionFromHex, satoshisToBtc } from '@utils/bitcoin-utils'
 import SimpleButton from '@components/SimpleButton'
 
 
 class ConfirmTransactionModal extends React.Component {
   broadcastTransaction = () => {
-    this.props.broadcastBitcoinTransaction(this.props.regTestMode, this.props.txHex)
+    const {signer, recipientAddress, amount} = this.props.data
+    this.props.buildAndBroadcastPistisTransferTransaction(signer, recipientAddress, amount, this.props.ptsNodeUrl)
   }
 
   render() {
     const { isOpen, handleClose, txHex, isBroadcasting } = this.props
-    const summary = txHex && summarizeTransactionFromHex(txHex)
+    // const data = txHex && summarizeTransactionFromHex(txHex)
+    const data = this.props.data
 
     return (
       <Modal
@@ -27,12 +28,12 @@ class ConfirmTransactionModal extends React.Component {
           Confirm Transaction
         </h3>
         <div className="modal-body">
-          {summary &&
+          {data &&
             <p>
               Are you sure you want to send{' '}
-              <strong>{satoshisToBtc(summary.outs[0].satoshis)} BTC</strong>
+              <strong>{data.amount} DEV</strong>
               {' '}to{' '}
-              <code>{summary.outs[0].address}</code>?
+              <code>{data.recipientAddress}</code>?
             </p>
           }
         </div>
@@ -55,12 +56,21 @@ ConfirmTransactionModal.propTypes = {
   // Redux props
   regTestMode: PropTypes.bool,
   isBroadcasting: PropTypes.bool,
-  broadcastBitcoinTransaction: PropTypes.func.isRequired
+  broadcastBitcoinTransaction: PropTypes.func.isRequired,
+  account: PropTypes.object.isRequired,
+  buildAndBroadcastPistisTransferTransaction: PropTypes.func.isRequired,
+  ptsNodeUrl: PropTypes.string.isRequired,
 }
 
-export default connect((state) => ({
-  regTestMode: state.settings.api.regTestMode,
-  isBroadcasting: state.account.coreWallet.withdrawal.isBroadcasting
-}), (dispatch) =>
+function mapStateToProps(state) {
+  return {
+    account: state.account,
+    regTestMode: state.settings.api.regTestMode,
+    ptsNodeUrl: state.settings.api.ptsNodeUrl,
+    isBroadcasting: state.account.coreWallet.withdrawal.isBroadcasting
+  }
+}
+
+export default connect(mapStateToProps, (dispatch) =>
   bindActionCreators({ ...AccountActions }, dispatch)
 )(ConfirmTransactionModal)

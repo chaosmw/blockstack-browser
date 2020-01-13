@@ -12,7 +12,7 @@ import {
 } from '@utils'
 import { isCoreEndpointDisabled } from '@utils/window-utils'
 import { transactions, config, network } from 'blockstack'
-import { Rpc, ptsToDev } from '../../../chain'
+import { Rpc, ptsToDev, devToPts } from '../../../chain'
 
 import roundTo from 'round-to'
 import * as types from './types'
@@ -48,7 +48,6 @@ function createAccount(
   } = getBlockchainIdentities(masterKeychain, identitiesToGenerate)
 
   const {
-    substrateKeyring,
     substrateAddresses
   } = getSubstrateKeyring(backupPhrase, identitiesToGenerate)
 
@@ -60,7 +59,6 @@ function createAccount(
     firstBitcoinAddress,
     identityAddresses,
     identityKeypairs,
-    substrateKeyring,
     substrateAddresses
   }
 }
@@ -310,6 +308,35 @@ function resetCoreWithdrawal() {
   }
 }
 
+function buildAndBroadcastPistisTransferTransaction(
+  signer,
+  recipientAddress, 
+  amountDev,
+  nodeUrl
+) {
+  return dispatch => {
+    logger.info("building pistis transfer transaction")
+    dispatch(buildTransaction(recipientAddress)) 
+    const amountPts = devToPts(amountDev)
+    logger.debug(
+      `building transaction to send ${amountPts} pts to ${recipientAddress}`
+    )
+    
+    return Rpc.transfer(signer, recipientAddress, amountPts, nodeUrl)
+      .then(txHex => {
+        logger.info(`Succesfully built pistis transaction: ${txHex}`)
+        dispatch(buildTransactionSuccess(txHex))
+        logger.info(`Succesfully broadcast pistis transaction: ${txHex}`)
+        dispatch(broadcastTransaction())
+        dispatch(broadcastTransactionSuccess())
+      })
+      .catch(err => {
+        logger.error(`Failed to build pistis transaction: ${err}`)
+        dispatch(buildTransactionError(err.message || err.toString()))
+      })
+  }
+}
+
 function buildBitcoinTransaction(
   regTestMode,
   paymentKey,
@@ -517,19 +544,12 @@ function refreshPtsBalances(balanceURL, addresses) {
         logger.debug( 
           `refreshPtsBalances: refreshing pts balances for address ${address}`
         )
-        
-        // TODO: 
-        // return Promise.resolve({
-        //     total: 888
-        // }).then(balances => {
-        //   dispatch(updatePtsBalances(balances))
-        // })
 
         return Rpc.queryBalance(address, balanceURL)
           .then(response => {
             results.push({
               address,
-              balance: ptsToDev(parseInt(response)) // TODO: 
+              balance: ptsToDev(parseInt(response)) 
             })
 
             if (results.length >= addresses.length) {
@@ -642,6 +662,7 @@ const AccountActions = {
   refreshCoreWalletBalance,
   resetCoreWithdrawal,
   buildBitcoinTransaction,
+  buildAndBroadcastPistisTransferTransaction,
   broadcastBitcoinTransaction,
   withdrawBitcoinFromCoreWallet,
   emailNotifications,

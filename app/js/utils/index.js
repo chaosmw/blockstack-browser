@@ -1,4 +1,5 @@
 export {
+  decryptMnemonic,
   decryptMasterKeychain,
   deriveIdentityKeyPair,
   getBitcoinPrivateKeychain,

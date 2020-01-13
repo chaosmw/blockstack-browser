@@ -3,10 +3,10 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
-  decryptMasterKeychain,
-  getBitcoinPrivateKeychain,
-  getBitcoinAddressNode
+  decryptMnemonic,
+  getSubstrateKeyring
 } from '../utils'
+import log4js from 'log4js'
 
 import { AccountActions } from '../account/store/account'
 
@@ -16,11 +16,12 @@ import Balance from './components/Balance'
 import ConfirmTransactionModal from './components/ConfirmTransactionModal'
 import SimpleButton from '@components/SimpleButton'
 
+const logger = log4js.getLogger(__filename)
+
 function mapStateToProps(state) {
   return {
     account: state.account,
     regTestMode: state.settings.api.regTestMode,
-    localIdentities: state.profiles.identity.localIdentities
   }
 }
 
@@ -34,7 +35,6 @@ class SendPage extends Component {
     regTestMode: PropTypes.bool.isRequired,
     localIdentites: PropTypes.array.isRequired,
     resetCoreWithdrawal: PropTypes.func.isRequired,
-    buildBitcoinTransaction: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -45,6 +45,7 @@ class SendPage extends Component {
       amount: '',
       password: '',
       recipientAddress: '',
+      signer: null,
       isConfirming: false
     }
   }
@@ -54,18 +55,15 @@ class SendPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.localIdentities.map(x => x.usernamePending).includes(true)) {
-      this.updateAlert('danger', 'You have a pending name registration. Withdrawing bitcoin' +
-                       ' may interfere with that registration\'s bitcoin transactions.')
-    }
-
     // Handle changes in withdrawal state
     if (this.props.account.coreWallet) {
       const thisWithdrawal = this.props.account.coreWallet.withdrawal
       const nextWithdrawal = nextProps.account.coreWallet.withdrawal
 
+      logger.info(`componentWillReceiveProps: thisWithdrawal: ${JSON.stringify(thisWithdrawal)} \n nextWithdrawal: ${JSON.stringify(nextWithdrawal)}`)
+
       if (nextWithdrawal.txHex && thisWithdrawal.txHex !== nextWithdrawal.txHex) {
-        this.setState({ isConfirming: true })
+        this.setState({ isConfirming: false })
       }
       else if (nextWithdrawal.error && thisWithdrawal.error !== nextWithdrawal.error) {
         this.updateAlert('danger', nextWithdrawal.error)
@@ -97,12 +95,12 @@ class SendPage extends Component {
     })
   }
 
-  buildTransaction = (event) => {
+  prepareTransaction = (event) => {
     event.preventDefault()
     const { password, amount, recipientAddress } = this.state
     const { account, regTestMode } = this.props
-    const btcAddress = account.bitcoinAccount.addresses[0]
-    const balance = account.bitcoinAccount.balances[btcAddress]
+    const ptsAddress = account.pistisAccount.addresses[0]
+    const balance = account.pistisAccount.balances[ptsAddress]
 
     if (!password || !amount || !recipientAddress) {
       this.updateAlert('danger', 'All fields are required')
@@ -122,39 +120,44 @@ class SendPage extends Component {
       disabled: true,
       alerts: []
     })
-    decryptMasterKeychain(password, account.encryptedBackupPhrase)
-    .then(masterKeychain => {
-      const bitcoinPrivateKeychain = getBitcoinPrivateKeychain(masterKeychain)
-      const bitcoinAddressHDNode = getBitcoinAddressNode(bitcoinPrivateKeychain, 0)
-      const paymentKey = bitcoinAddressHDNode.keyPair.d.toBuffer(32).toString('hex')
-
-      this.props.buildBitcoinTransaction(
-        regTestMode,
-        `${paymentKey}01`,
-        recipientAddress,
-        amount
-      )
-    })
+    decryptMnemonic(password, account.encryptedBackupPhrase)
+      .then(backupPhrase => {
+        // FIXME: 
+        const { substrateKeyring, substrateAddresses } = getSubstrateKeyring(backupPhrase, 1)
+        let signer = substrateKeyring.getPair(ptsAddress)
+        this.setState({
+          signer: signer,
+          isConfirming: true
+        })
+      })
+      .catch(error => {
+        this.updateAlert(
+          'danger',
+          error.message
+        )
+        this.closeConfirmation()
+      })
   }
 
   closeConfirmation = () => {
     this.setState({
+      signer: null,
       isConfirming: false,
       disabled: false
     })
   }
 
   setAmountAll = () => {
-    const { bitcoinAccount } = this.props.account
-    const btcAddress = bitcoinAccount.addresses[0]
-    this.setState({ amount: bitcoinAccount.balances[btcAddress].toString() })
+    const { pistisAccount } = this.props.account
+    const ptsAddress = pistisAccount.addresses[0]
+    this.setState({ amount: pistisAccount.balances[ptsAddress].toString() })
   }
 
   render() {
-    const { bitcoinAccount } = this.props.account
+    const { pistisAccount } = this.props.account
     const { isConfirming, disabled } = this.state
-    const btcAddress = bitcoinAccount.addresses[0]
-    const balance = bitcoinAccount.balances[btcAddress]
+    const ptsAddress = pistisAccount.addresses[0]
+    const balance = pistisAccount.balances[ptsAddress]
 
     return (
       <div>
@@ -162,7 +165,7 @@ class SendPage extends Component {
         {this.state.alerts.map(alert =>
           <Alert key={alert.message} message={alert.message} status={alert.status} />
         )}
-        <form onSubmit={this.buildTransaction}>
+        <form onSubmit={this.prepareTransaction}>
           <InputGroupSecondary
             data={this.state}
             onChange={this.onValueChange}
@@ -205,7 +208,8 @@ class SendPage extends Component {
         <ConfirmTransactionModal
           isOpen={isConfirming}
           handleClose={this.closeConfirmation}
-          txHex={this.props.account.coreWallet.withdrawal.txHex}
+          txHex={this.props.account.coreWallet.withdrawal.txHex} 
+          data={{signer: this.state.signer, recipientAddress: this.state.recipientAddress, amount: this.state.amount}}
         />
       </div>
     )

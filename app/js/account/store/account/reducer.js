@@ -16,7 +16,6 @@ const initialState = {
     balances: { total: 0.0 }
   },
   pistisAccount: {
-    keyring: null,
     addresses: [],
     balances: { total: 0.0 }
   },
@@ -57,7 +56,6 @@ function AccountReducer(state = initialState, action) {
           balances: state.bitcoinAccount.balances
         },
         pistisAccount: {
-          keyring: action.substrateKeyring,
           addresses: action.substrateAddresses,
           addressIndex: 0,
           balances: state.pistisAccount.balances 
