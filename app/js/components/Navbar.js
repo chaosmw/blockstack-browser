@@ -24,12 +24,12 @@ const navBarData = [
       path: '/profiles',
       active: 'profiles'
     },
-    {
-      label: 'Wallet',
-      icon: WalletIcon,
-      path: '/wallet/receive',
-      active: 'wallet'
-    },
+    // {
+    //   label: 'Wallet',
+    //   icon: WalletIcon,
+    //   path: '/wallet/receive',
+    //   active: 'wallet'
+    // },
     {
       label: 'Pistis',
       icon: WalletIcon,

@@ -20,8 +20,9 @@ export class AccountMenu extends Component {
   }
 
   render() {
+    // disable storage providers by hsiung
     const tabs = [
-      { url: '/account/storage', label: 'storage providers' },
+      // { url: '/account/storage', label: 'storage providers' },
       { url: '/account/password', label: 'change password' },
       { url: '/account/backup', label: 'backup & restore' },
       { url: '/account/delete', label: 'reset browser' },

@@ -35,6 +35,12 @@ async function queryBalance(address, nodeUrl) {
    return response;
 }
 
+// async function queryName(address, nodeUrl) {
+//     logger.info(`query name of ${address} from node ${nodeUrl} ...`);
+//     const api = await init(nodeUrl);
+//     const response = await api.query.nameServiceModule.
+// }
+
 async function transfer(signer, to, amount, nodeUrl) {
     let from = signer.address
     logger.info(`transfer ${amount} DEV from ${from} to ${to} via ${nodeUrl} ...`)
@@ -63,6 +69,7 @@ async function transfer(signer, to, amount, nodeUrl) {
 
 const Rpc = {
     queryBalance,
+    // queryName,
     transfer
 }
 

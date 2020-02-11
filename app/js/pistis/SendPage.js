@@ -33,7 +33,7 @@ class SendPage extends Component {
   static propTypes = {
     account: PropTypes.object.isRequired,
     regTestMode: PropTypes.bool.isRequired,
-    localIdentites: PropTypes.array.isRequired,
+    // localIdentites: PropTypes.array.isRequired,
     resetCoreWithdrawal: PropTypes.func.isRequired,
   }
 
@@ -71,6 +71,7 @@ class SendPage extends Component {
       }
       else if (!thisWithdrawal.success && nextWithdrawal.success) {
         this.closeConfirmation()
+        this.reset() 
         this.updateAlert('success', 'Your transaction was succesfully broadcasted!')
       }
     }
@@ -92,6 +93,14 @@ class SendPage extends Component {
         status: alertStatus,
         message: alertMessage
       }]
+    })
+  }
+
+  reset() {
+    this.setState({
+      amount: '',
+      password: '',
+      recipientAddress: '',
     })
   }
 

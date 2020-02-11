@@ -170,7 +170,8 @@ class AppContainer extends Component {
       Date.now() - this.props.lastUpdatedApps > 900000 // 15 min
     ) {
       // Fetch those apps if data is state
-      this.props.doFetchApps()
+      // Disable fetching apps by hsiung
+      // this.props.doFetchApps()
     }
   }
 

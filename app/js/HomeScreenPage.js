@@ -191,10 +191,11 @@ class HomeScreenPage extends React.Component {
       this.props.apps.loading ||
       !this.props.apps.topApps ||
       !this.props.apps.topApps.length
+    // Disable fetching apps by hsiung
     return (
       <Box>
         <Navbar hideBackToHomeLink activeTab="home" />
-        <Box className="home-screen">
+        {/* <Box className="home-screen">
           {loading ? (
             <Loading />
           ) : (
@@ -203,7 +204,7 @@ class HomeScreenPage extends React.Component {
               topApps={!loading && this.props.apps.topApps}
             />
           )}
-        </Box>
+        </Box> */}
       </Box>
     )
   }

@@ -15,7 +15,6 @@ class ConfirmTransactionModal extends React.Component {
 
   render() {
     const { isOpen, handleClose, txHex, isBroadcasting } = this.props
-    // const data = txHex && summarizeTransactionFromHex(txHex)
     const data = this.props.data
 
     return (
